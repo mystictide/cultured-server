@@ -10,5 +10,6 @@ namespace cultured.server.Infrastructure.Data.Interface.Culture
         Task<FilteredList<Backgrounds>> FilterBackgrounds(Filter filter);
         Task<bool> DeleteBackground(int ID);
         Task<string> GetBackgroundImage();
+        Task<Character> GetCharacter(int? ID, string? Name);
     }
 }

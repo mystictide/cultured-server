@@ -21,5 +21,20 @@ namespace cultured.server.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("get/character")]
+        public async Task<IActionResult> GetCharacter(int? ID, string? Name)
+        {
+            try
+            {
+                var result = await new MainManager().GetCharacter(ID, Name);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

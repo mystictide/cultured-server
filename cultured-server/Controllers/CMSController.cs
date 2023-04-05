@@ -70,7 +70,7 @@ namespace cultured.server.Controllers
         }
 
         [HttpPost]
-        [Route("filter")]
+        [Route("filter/characters")]
         public async Task<IActionResult> FilterCharacters([FromBody] Filter filter)
         {
             try
@@ -146,7 +146,7 @@ namespace cultured.server.Controllers
         }
 
         [HttpGet]
-        [Route("get/category")]
+        [Route("get/categories")]
         public async Task<IActionResult> GetCategory()
         {
             try

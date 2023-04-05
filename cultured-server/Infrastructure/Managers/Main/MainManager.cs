@@ -2,6 +2,7 @@
 using cultured.server.Infrasructure.Models.Helpers;
 using cultured.server.Infrastructure.Data.Repo.Main;
 using cultured.server.Infrastructure.Models.Helpers;
+using cultured.server.Infrastructure.Models.Culture;
 using cultured.server.Infrastructure.Data.Interface.Culture;
 
 namespace cultured.server.Infrastructure.Managers.Main
@@ -27,6 +28,11 @@ namespace cultured.server.Infrastructure.Managers.Main
         public async Task<string> GetBackgroundImage()
         {
             return await _repo.GetBackgroundImage();
+        }
+
+        public async Task<Character> GetCharacter(int? ID, string? Name)
+        {
+            return await _repo.GetCharacter(ID, Name);
         }
 
         public async Task<Backgrounds> ManageBackground(Backgrounds model)

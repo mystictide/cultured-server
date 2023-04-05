@@ -65,35 +65,54 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                 };
                 FilteredList<Character> result = new FilteredList<Character>();
                 string WhereClause = "";
+                string recursive = "";
                 if (filter.Keyword != null && filter.Keyword != "")
                 {
                     WhereClause = $@" WHERE name ILIKE '%{filter.Keyword}%'";
                 }
                 if (filter.CategoryName != null && filter.CategoryName != "")
                 {
-                    WhereClause = $@" WHERE t.categoryid in (SELECT id FROM category 
-                    WHERE name ILIKE '%{filter.CategoryName}%')
+                    WhereClause = $@" WHERE t.categoryid in (SELECT id from cat)
                     AND t.name ILIKE '%{filter.Keyword}%'";
+                    recursive = $@"
+                    with recursive cat as (
+                          select * from category c 
+                          where c.name ILIKE '%{filter.CategoryName}%' union
+                          select category.* from category 
+                          join cat on cat.id = category.parentid)";
                 }
                 if (filter.CategoryID > 0)
                 {
-                    WhereClause = $@"WHERE t.categoryid = {filter.CategoryID}
+                    WhereClause = $@"WHERE t.categoryid in (SELECT id from cat)
                     AND t.name ILIKE '%{filter.Keyword}%'";
+                    recursive = $@"
+                    with recursive cat as (
+                          select * from category c 
+                          where c.id = {filter.CategoryID} union
+                          select category.* from category 
+                          join cat on cat.id = category.parentid)";
                 }
 
-                string query_count = $@"Select Count(t.id) from character t {WhereClause}";
+                string query_count = $@"{recursive} Select Count(t.id) from character t {WhereClause}";
 
                 using (var con = GetConnection)
                 {
                     result.totalItems = await con.QueryFirstOrDefaultAsync<int>(query_count);
                     request.filter.pager = new Page(result.totalItems, request.filter.pageSize, request.filter.page);
                     string query = $@"
+                    {recursive}
                     SELECT * FROM character t
+                    left join category c on c.id = t.categoryid
                     {WhereClause}
                     ORDER BY t.id DESC 
                     OFFSET {request.filter.pager.StartIndex} ROWS
                     FETCH NEXT {request.filter.pageSize} ROWS ONLY";
-                    result.data = await con.QueryAsync<Character>(query);
+                    result.data = await con.QueryAsync<Character, Category, Character>(query, (chr, cat) =>
+                    {
+                        chr.Category = cat;
+                        return chr;
+                    },
+    splitOn: "CategoryId");
                     result.filter = request.filter;
                     result.filterModel = request.filterModel;
                     return result;
@@ -130,11 +149,11 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                 dynamic identity = model.ID.HasValue ? model.ID.Value : "default";
 
                 string query = $@"
-                INSERT INTO category (id, name)
-	 	                VALUES ({identity}, '{model.Name}')
+                INSERT INTO category (id, name, parentid)
+	 	                VALUES ({identity}, '{model.Name}', NULLIF('{model.ParentID}', '')::integer)
                 ON CONFLICT (id) DO UPDATE 
-                SET Name = '{model.Name}',
-                       parentid = {model.ParentID};
+                SET name = '{model.Name}',
+                       parentid = NULLIF('{model.ParentID}', '')::integer;
                 SELECT * FROM category c ";
 
                 using (var connection = GetConnection)
@@ -159,6 +178,10 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                 {
                     model.Name = model.Name.Replace("'", "''");
                 }
+                if (model.Body.Contains("'"))
+                {
+                    model.Body = model.Body.Replace("'", "''");
+                }
 
                 string query = $@"
                 INSERT INTO character (id, name, body, categoryid, alt)
@@ -167,12 +190,13 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                 SET name = '{model.Name}',
                        body = '{model.Body}',
                        categoryid = '{model.Category.ID}',
-                       alt = '{model.Alt}'
+                       alt = '{model.Alt ?? null}'
                 RETURNING *";
 
                 using (var connection = GetConnection)
                 {
                     var res = await connection.QueryFirstOrDefaultAsync<Character>(query);
+                    res.Category = model.Category;
                     if (res.Images.Count > 0)
                     {
                         res.Images = await ManageImages(res.Images, res.ID.Value);
