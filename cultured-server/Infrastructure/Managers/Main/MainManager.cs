@@ -20,6 +20,10 @@ namespace cultured.server.Infrastructure.Managers.Main
             return await _repo.DeleteBackground(ID);
         }
 
+        public async Task<IEnumerable<Category>> GetCategory(bool? main, int? parentid)
+        {
+            return await _repo.GetCategory(main, parentid);
+        }
         public async Task<FilteredList<Backgrounds>> FilterBackgrounds(Filter filter)
         {
             return await _repo.FilterBackgrounds(filter);

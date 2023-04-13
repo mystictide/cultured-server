@@ -112,28 +112,10 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                         chr.Category = cat;
                         return chr;
                     },
-    splitOn: "CategoryId");
+    splitOn: "id");
                     result.filter = request.filter;
                     result.filterModel = request.filterModel;
                     return result;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public async Task<IEnumerable<Category>> GetCategory()
-        {
-            try
-            {
-                string query = $@"SELECT * FROM category";
-
-                using (var connection = GetConnection)
-                {
-                    var res = await connection.QueryAsync<Category>(query);
-                    return res;
                 }
             }
             catch (Exception)
@@ -148,11 +130,18 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
             {
                 dynamic identity = model.ID.HasValue ? model.ID.Value : "default";
 
+                if (model.Description.Contains("'"))
+                {
+                    model.Description = model.Description.Replace("'", "''");
+                }
+
                 string query = $@"
-                INSERT INTO category (id, name, parentid)
-	 	                VALUES ({identity}, '{model.Name}', NULLIF('{model.ParentID}', '')::integer)
+                INSERT INTO category (id, name, imageurl, description, parentid)
+	 	                VALUES ({identity}, '{model.Name}', '{model.ImageURL}', '{model.Description}', NULLIF('{model.ParentID}', '')::integer)
                 ON CONFLICT (id) DO UPDATE 
                 SET name = '{model.Name}',
+                       imageurl = '{model.ImageURL}',
+                       description = '{model.Description}',
                        parentid = NULLIF('{model.ParentID}', '')::integer;
                 SELECT * FROM category c ";
 
@@ -184,55 +173,21 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                 }
 
                 string query = $@"
-                INSERT INTO character (id, name, body, categoryid, alt)
-	 	                VALUES ({identity}, '{model.Name}', '{model.Body}', '{model.Category.ID}', '{model.Alt}')
+                INSERT INTO character (id, name, body, categoryid, alt, imageurl)
+	 	                VALUES ({identity}, '{model.Name}', '{model.Body}', '{model.Category.ID}', '{model.Alt}', '{model.ImageURL}')
                 ON CONFLICT (id) DO UPDATE 
                 SET name = '{model.Name}',
                        body = '{model.Body}',
                        categoryid = '{model.Category.ID}',
-                       alt = '{model.Alt ?? null}'
+                       alt = '{model.Alt ?? null}',
+                       imageurl = '{model.ImageURL ?? null}'
                 RETURNING *";
 
                 using (var connection = GetConnection)
                 {
                     var res = await connection.QueryFirstOrDefaultAsync<Character>(query);
                     res.Category = model.Category;
-                    if (res.Images.Count > 0)
-                    {
-                        res.Images = await ManageImages(res.Images, res.ID.Value);
-                    }
                     return res;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-        public async Task<List<Image>> ManageImages(List<Image> model, int ID)
-        {
-            try
-            {
-                using (var connection = GetConnection)
-                {
-                    List<Image> fmodel = new List<Image>();
-                    string dquery = $@"
-                    DELETE FROM character_images t WHERE t.characterid = {ID};";
-                    await connection.ExecuteAsync(dquery);
-                    foreach (var item in model)
-                    {
-                        dynamic identity = item.ID.HasValue ? item.ID.Value : "default";
-                        string query = $@"
-                        INSERT INTO character_images (id, characterid, imageurl)
-	 	                VALUES ({identity}, '{item.CharacterID}', '{item.ImageURL}')
-                        ON CONFLICT (id) DO UPDATE 
-                        SET characterid = '{item.CharacterID}',
-                               imageurl = '{item.ImageURL}'
-                        RETURNING *";
-                        var res = await connection.QueryFirstOrDefaultAsync<Image>(query);
-                        fmodel.Add(res);
-                    }
-                    return fmodel;
                 }
             }
             catch (Exception)

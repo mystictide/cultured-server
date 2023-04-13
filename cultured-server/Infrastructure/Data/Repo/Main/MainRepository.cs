@@ -9,6 +9,33 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
 {
     public class MainRepository : AppSettings, IMain
     {
+        public async Task<IEnumerable<Category>> GetCategory(bool? main, int? parentid)
+        {
+            try
+            {
+                string whereClause = "";
+                if (main.HasValue && main == true)
+                {
+                    whereClause = @"where parentid is null";
+                }
+                if (parentid > 0)
+                {
+                    whereClause = $@"where parentid = {parentid}";
+                }
+                string query = $@"SELECT * FROM category c {whereClause} order by c.parentid is null desc, c.id asc";
+
+                using (var connection = GetConnection)
+                {
+                    var res = await connection.QueryAsync<Category>(query);
+                    return res;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<bool> DeleteBackground(int ID)
         {
             try
@@ -92,7 +119,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
                 }
                 else
                 {
-                    WhereClause = $@" WHERE name ILIKE '%{Name}%'";
+                    WhereClause = $@" WHERE name ILIKE '%{Name}%' or alt ILIKE '%{Name}%'";
                 }
                 string query = $@"
                     SELECT * FROM character t

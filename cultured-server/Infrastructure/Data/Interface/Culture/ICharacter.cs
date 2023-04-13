@@ -10,6 +10,5 @@ namespace cultured.server.Infrastructure.Data.Interface.Culture
         Task<IEnumerable<Category>> ManageCategory(Category model);
         Task<FilteredList<Character>> FilterCharacters(Filter filter);
         Task<IEnumerable<Character>> CharactersByCategory(string category);
-        Task<IEnumerable<Category>> GetCategory();
     }
 }

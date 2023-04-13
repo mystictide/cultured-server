@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using cultured.server.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using cultured.server.Infrastructure.Managers.Main;
 
 namespace cultured.server.Controllers
@@ -29,6 +30,21 @@ namespace cultured.server.Controllers
             try
             {
                 var result = await new MainManager().GetCharacter(ID, Name);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("get/categories")]
+        public async Task<IActionResult> GetCategory([FromQuery] bool? main, [FromQuery] int? parentid)
+        {
+            try
+            {
+                var result = await new MainManager().GetCategory(main: main, parentid: parentid);
                 return Ok(result);
             }
             catch (Exception ex)

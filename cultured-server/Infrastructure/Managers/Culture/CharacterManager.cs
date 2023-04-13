@@ -29,11 +29,6 @@ namespace cultured.server.Infrastructure.Managers.Culture
             return await _repo.FilterCharacters(filter);
         }
 
-        public async Task<IEnumerable<Category>> GetCategory()
-        {
-            return await _repo.GetCategory();
-        }
-
         public async Task<IEnumerable<Category>> ManageCategory(Category model)
         {
             return await _repo.ManageCategory(model);

@@ -124,7 +124,7 @@ namespace cultured.server.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
-        }       
+        }
 
         [HttpPost]
         [Route("delete/background")]
@@ -135,25 +135,6 @@ namespace cultured.server.Controllers
                 if (AuthHelpers.Authorize(HttpContext))
                 {
                     var result = await new MainManager().DeleteBackground(ID);
-                    return Ok(result);
-                }
-                return StatusCode(500, "Authorization failed");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        [HttpGet]
-        [Route("get/categories")]
-        public async Task<IActionResult> GetCategory()
-        {
-            try
-            {
-                if (AuthHelpers.Authorize(HttpContext))
-                {
-                    var result = await new CultureManager().GetCategory();
                     return Ok(result);
                 }
                 return StatusCode(500, "Authorization failed");
