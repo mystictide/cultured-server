@@ -11,5 +11,8 @@ namespace cultured.server.Infrastructure.Models.Culture
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? ImageURL { get; set; }
+
+        [Write(false)]
+        public int ItemCount { get; set; }
     }
 }

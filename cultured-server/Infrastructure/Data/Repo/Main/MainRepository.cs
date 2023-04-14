@@ -22,7 +22,9 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
                 {
                     whereClause = $@"where parentid = {parentid}";
                 }
-                string query = $@"SELECT * FROM category c {whereClause} order by c.parentid is null desc, c.id asc";
+                string query = $@"SELECT c.*
+                ,(select count(id) from character cc where categoryid = c.id) as itemcount
+                FROM category c {whereClause} order by c.parentid is null desc, c.id asc";
 
                 using (var connection = GetConnection)
                 {
