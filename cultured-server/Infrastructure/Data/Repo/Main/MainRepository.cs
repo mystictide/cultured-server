@@ -9,7 +9,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
 {
     public class MainRepository : AppSettings, IMain
     {
-        public async Task<IEnumerable<Category>> GetCategory(bool? main, int? parentid)
+        public async Task<IEnumerable<Category>> GetCategory(bool? main, bool? prev, int? parentid)
         {
             try
             {
@@ -21,6 +21,14 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
                 if (parentid > 0)
                 {
                     whereClause = $@"where parentid = {parentid}";
+                }
+                if (prev.HasValue && prev == true)
+                {
+                    whereClause = $@"where id in (select id from category c2 where c2.id = {parentid})";
+                    if (parentid == 1)
+                    {
+                        whereClause = @"where parentid is null";
+                    }
                 }
                 string query = $@"SELECT c.*
                 ,(select count(id) from character cc where categoryid = c.id) as itemcount
@@ -132,11 +140,11 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
                     string cQuery = $@"
                     with recursive cat as (
                       select * from category c 
-                      where c.id = {result.ID} union
+                      where c.id = {result.CategoryID} union
                       select category.* from category 
                       join cat on cat.parentid = category.id
                     )
-                    select * from cat order by id desc;";
+                    select * from cat;";
                     result.Categories = await con.QueryAsync<Category>(cQuery);
                     return result;
                 }

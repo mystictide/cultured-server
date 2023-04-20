@@ -27,7 +27,7 @@ namespace cultured.server.Controllers
 
         [HttpGet]
         [Route("get/character")]
-        public async Task<IActionResult> GetCharacter(int? ID, string? Name)
+        public async Task<IActionResult> GetCharacter([FromQuery] int? ID, [FromQuery] string? Name)
         {
             try
             {
@@ -42,11 +42,11 @@ namespace cultured.server.Controllers
 
         [HttpGet]
         [Route("get/categories")]
-        public async Task<IActionResult> GetCategory([FromQuery] bool? main, [FromQuery] int? parentid)
+        public async Task<IActionResult> GetCategory([FromQuery] bool? main, [FromQuery] bool? prev, [FromQuery] int? parentid)
         {
             try
             {
-                var result = await new MainManager().GetCategory(main: main, parentid: parentid);
+                var result = await new MainManager().GetCategory(main: main, prev: prev, parentid: parentid);
                 return Ok(result);
             }
             catch (Exception ex)

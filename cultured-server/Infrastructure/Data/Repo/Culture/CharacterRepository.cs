@@ -57,7 +57,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
             try
             {
                 var filterModel = new Character();
-                filter.pageSize = 20;
+                filter.pageSize = 16;
                 FilteredList<Character> request = new FilteredList<Character>()
                 {
                     filter = filter,
@@ -104,7 +104,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                     SELECT * FROM character t
                     left join category c on c.id = t.categoryid
                     {WhereClause}
-                    ORDER BY t.id DESC 
+                    ORDER BY t.id ASC
                     OFFSET {request.filter.pager.StartIndex} ROWS
                     FETCH NEXT {request.filter.pageSize} ROWS ONLY";
                     result.data = await con.QueryAsync<Character, Category, Character>(query, (chr, cat) =>

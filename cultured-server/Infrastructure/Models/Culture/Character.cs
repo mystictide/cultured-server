@@ -13,6 +13,9 @@ namespace cultured.server.Infrastructure.Models.Culture
         public string? ImageURL { get; set; }
 
         [Write(false)]
+        public string? CategoryID { get; set; }
+
+        [Write(false)]
         public Category? Category { get; set; }
 
         [Write(false)]

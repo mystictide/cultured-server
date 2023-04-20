@@ -11,6 +11,6 @@ namespace cultured.server.Infrastructure.Data.Interface.Culture
         Task<bool> DeleteBackground(int ID);
         Task<string> GetBackgroundImage();
         Task<Character> GetCharacter(int? ID, string? Name);
-        Task<IEnumerable<Category>> GetCategory(bool? main, int? parentid);
+        Task<IEnumerable<Category>> GetCategory(bool? main, bool? prev, int? parentid);
     }
 }
