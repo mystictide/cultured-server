@@ -25,7 +25,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
                 if (prev.HasValue && prev == true)
                 {
                     whereClause = $@"where id in (select id from category c2 where c2.id = {parentid})";
-                    if (parentid == 1)
+                    if (parentid == 1 || parentid == 2 || parentid == 24)
                     {
                         whereClause = @"where parentid is null";
                     }
