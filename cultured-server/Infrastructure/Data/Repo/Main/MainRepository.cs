@@ -85,7 +85,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Main
                     request.filter.pager = new Page(result.totalItems, request.filter.pageSize, request.filter.page);
                     string query = $@"
                     SELECT * FROM backgrounds t
-                    ORDER BY t.id DESC 
+                    ORDER BY t.id {filter.SortBy} 
                     OFFSET {request.filter.pager.StartIndex} ROWS
                     FETCH NEXT {request.filter.pageSize} ROWS ONLY";
                     result.data = await con.QueryAsync<Backgrounds>(query);

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using System.Globalization;
 using cultured.server.Infrasructure.Models.Helpers;
 using cultured.server.Infrastructure.Models.Helpers;
 using cultured.server.Infrastructure.Models.Culture;
@@ -104,7 +105,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                     SELECT * FROM character t
                     left join category c on c.id = t.categoryid
                     {WhereClause}
-                    ORDER BY t.id ASC
+                    ORDER BY t.id {filter.SortBy}
                     OFFSET {request.filter.pager.StartIndex} ROWS
                     FETCH NEXT {request.filter.pageSize} ROWS ONLY";
                     result.data = await con.QueryAsync<Character, Category, Character>(query, (chr, cat) =>

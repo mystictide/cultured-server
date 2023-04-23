@@ -1,4 +1,6 @@
-﻿namespace cultured.server.Infrasructure.Models.Helpers
+﻿using System.Xml.Linq;
+
+namespace cultured.server.Infrasructure.Models.Helpers
 {
     public class FilteredList<T> where T : class
     {
@@ -20,12 +22,16 @@
             CategoryName = "";
             pageSize = 10;
             page = 1;
+            SortBy = "desc";
         }
 
         public string? Keyword { get; set; }
 
         public int CategoryID { get; set; }
         public string? CategoryName { get; set; }
+
+        public string? SortBy { get; set; }
+
         public int page { get; set; }
 
         public int pageSize { get; set; }
