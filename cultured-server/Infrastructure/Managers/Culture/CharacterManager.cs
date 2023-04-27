@@ -19,6 +19,11 @@ namespace cultured.server.Infrastructure.Managers.Culture
             return await _repo.DeleteCharacter(ID);
         }
 
+        public async Task<bool> DeleteCategory(int ID)
+        {
+            return await _repo.DeleteCategory(ID);
+        }
+
         public async Task<IEnumerable<Character>> CharactersByCategory(string category)
         {
             return await _repo.CharactersByCategory(category);

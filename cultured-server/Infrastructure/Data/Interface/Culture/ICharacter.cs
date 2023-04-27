@@ -7,6 +7,7 @@ namespace cultured.server.Infrastructure.Data.Interface.Culture
     {
         Task<Character> ManageCharacter(Character model);
         Task<bool> DeleteCharacter(int ID);
+        Task<bool> DeleteCategory(int ID);
         Task<IEnumerable<Category>> ManageCategory(Category model);
         Task<FilteredList<Character>> FilterCharacters(Filter filter);
         Task<IEnumerable<Character>> CharactersByCategory(string category);

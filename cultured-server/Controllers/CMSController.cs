@@ -127,6 +127,25 @@ namespace cultured.server.Controllers
         }
 
         [HttpPost]
+        [Route("delete/category")]
+        public async Task<IActionResult> DeleteCategory([FromBody] int ID)
+        {
+            try
+            {
+                if (AuthHelpers.Authorize(HttpContext))
+                {
+                    var result = await new CultureManager().DeleteCategory(ID);
+                    return Ok(result);
+                }
+                return StatusCode(500, "Authorization failed");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
         [Route("delete/background")]
         public async Task<IActionResult> DeleteBackgrounds([FromBody] int ID)
         {

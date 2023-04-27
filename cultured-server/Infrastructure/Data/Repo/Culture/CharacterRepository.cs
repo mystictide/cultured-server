@@ -13,8 +13,27 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
             try
             {
                 string query = $@"
-                DELETE FROM character t WHERE t.id = {ID};
-                DELETE FROM character_images t WHERE t.characterid = {ID};";
+                DELETE FROM character t WHERE t.id = {ID};";
+
+                using (var connection = GetConnection)
+                {
+                    var res = await connection.ExecuteAsync(query);
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteCategory(int ID)
+        {
+            try
+            {
+                string query = $@"
+                DELETE FROM category t WHERE t.id = {ID};
+                DELETE FROM category t WHERE t.parentid = {ID};";
 
                 using (var connection = GetConnection)
                 {
