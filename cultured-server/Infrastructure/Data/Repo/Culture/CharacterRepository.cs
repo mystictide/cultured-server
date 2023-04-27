@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using System.Globalization;
 using cultured.server.Infrasructure.Models.Helpers;
 using cultured.server.Infrastructure.Models.Helpers;
 using cultured.server.Infrastructure.Models.Culture;
@@ -69,7 +68,7 @@ namespace cultured.server.Infrastructure.Data.Repo.Culture
                 string recursive = "";
                 if (filter.Keyword != null && filter.Keyword != "")
                 {
-                    WhereClause = $@" WHERE name ILIKE '%{filter.Keyword}%'";
+                    WhereClause = $@" WHERE t.name ILIKE '%{filter.Keyword}%'";
                 }
                 if (filter.CategoryName != null && filter.CategoryName != "")
                 {
